@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import *
 
+'''Стандартные модели сериализаторов.
+Определяю поля для связанных моделей'''
+
 
 class AnimalSerializer(serializers.ModelSerializer):
 
@@ -10,7 +13,7 @@ class AnimalSerializer(serializers.ModelSerializer):
 
 
 class AnimalTypeSerializer(serializers.ModelSerializer):
-    animals = serializers.StringRelatedField(many=True, allow_null=True)
+    animals = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = AnimalType
@@ -27,7 +30,8 @@ class ShelterSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
-    animals = serializers.StringRelatedField(many=True, allow_null=True)
+    animals = serializers.StringRelatedField(many=True)
+    shelters = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Staff

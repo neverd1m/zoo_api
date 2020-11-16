@@ -1,12 +1,13 @@
 from django.db import models
-from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Create your models here.
+from django.utils import timezone
 
 
 class Animal(models.Model):
 
-    name = models.CharField(db_index=True, max_length=50)
+    name = models.CharField(db_index=True, max_length=50, unique=True)
     animal_type = models.ForeignKey(
         'AnimalType', on_delete=models.PROTECT, related_name='animals', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -21,10 +22,7 @@ class Animal(models.Model):
     def __str__(self):
         return self.name
 
-    def __init__(self, *args, **kwargs):
-        super(Animal, self).__init__(*args, **kwargs)
-        self.__original_staff = self.staff
-
+# При сохранении модели, проставляю дату смены staff'а
     def save(self, *args, **kwargs):
         if self.staff != self.__original_staff:
             self.linked_staff_date = timezone.now()
@@ -32,13 +30,19 @@ class Animal(models.Model):
         super(Animal, self).save(*args, **kwargs)
         self.__original_staff = self.staff
 
-    # def post_save(self, **args, **kwargs):
-    #     if self.animal_type:
-    #         super().save()
+
+# считаю кол-во животных текущего типа
+@receiver(post_save, sender=Animal)
+def count_animals(sender, instance, **kwargs):
+    if instance.animal_type:
+        animal_type = instance.animal_type
+        quantity = animal_type.animals.count()
+        animal_type.quantity = quantity
+        animal_type.save()
 
 
 class AnimalType(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
     quantity = models.IntegerField(default=0)
@@ -47,14 +51,9 @@ class AnimalType(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-
-        super(Animal, self).save(*args, **kwargs)
-        self.quantity = self.animals.count()
-
 
 class Shelter(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
 
@@ -63,7 +62,7 @@ class Shelter(models.Model):
 
 
 class Staff(models.Model):
-    name = models.CharField(db_index=True, max_length=50)
+    name = models.CharField(db_index=True, max_length=50, unique=True)
     phone = models.IntegerField()
     probation = models.BooleanField(default=True)
     shelter = models.ForeignKey(

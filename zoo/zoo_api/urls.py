@@ -19,6 +19,9 @@ from rest_framework import routers
 
 from . import views
 
+# не писал отдельные views, т.к. кажется, что DefaultRoter
+# предоставляет достаточно для решения задания.
+
 router = routers.DefaultRouter()
 router.register(r'animals', views.AnimalViewSet)
 router.register(r'animal_types', views.AnimalTypeViewSet)
