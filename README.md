@@ -1,11 +1,11 @@
 ### Мой первый опыт с DRF и django-filters
 
 ## Requirements.txt
-asgiref==3.3.1
-Django==3.1.3
-django-filter==2.4.0
-djangorestframework==3.12.2
-pytz==2020.4
+asgiref==3.3.1  
+Django==3.1.3  
+django-filter==2.4.0  
+djangorestframework==3.12.2  
+pytz==2020.4  
 sqlparse==0.4.1
 
 ## Установка из терминала
@@ -21,19 +21,19 @@ sqlparse==0.4.1
 
 Сортировка работает с помощью параметра **ordering** и поддерживает все поля моделей, обратная сортировка с помощью символа **-**.
 
-Сортировка:
-`http://127.0.0.1:8000/animal_types/?ordering=name`
-`http://127.0.0.1:8000/shelters/?ordering=-created_at`
+Сортировка:  
+`http://127.0.0.1:8000/animal_types/?ordering=name`  
+`http://127.0.0.1:8000/shelters/?ordering=-created_at`  
 
-Стандартные фильтры:
-`http://127.0.0.1:8000/animals/?created_at=2020-11-15`
-`http://127.0.0.1:8000/animals/?animal_type=Млекопитающие`
-`http://127.0.0.1:8000/animals/?staff=Дима`
-`http://127.0.0.1:8000/animals/?shelter=Вольер`
+Стандартные фильтры:  
+`http://127.0.0.1:8000/animals/?created_at=2020-11-15`  
+`http://127.0.0.1:8000/animals/?animal_type=Млекопитающие`  
+`http://127.0.0.1:8000/animals/?staff=Дима` 
+`http://127.0.0.1:8000/animals/?shelter=Вольер`  
 
 
-Сложные фильтры:
-`http://127.0.0.1:8000/animals/?staff=Дима&linked_duration=2019-11-14`
+Сложные фильтры:  
+`http://127.0.0.1:8000/animals/?staff=Дима&linked_duration=2019-11-14`  
 `http://127.0.0.1:8000/animals/?shelter_created=2020-11-10&shelter_updated=2020-11-16`
 
 >Условие продолжительности я не очень понял. Сравнивать дату привязки животного и сотрудника можно только зная дату, с которой мы сравниваем, а не саму продолжительность. Иначе придется вносить значение продолжительности в сам экземпляр модели животного, а это как-то не то. Поэтому я просто сравниваю с переданной датой linked_duration и возвращаю животных, у кого дата изменения стафа ДО переданной.
