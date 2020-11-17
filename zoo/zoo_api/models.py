@@ -12,23 +12,11 @@ class Animal(models.Model):
         'AnimalType', on_delete=models.PROTECT, related_name='animals', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
-    linked_staff_date = models.DateTimeField(null=True)
-    __original_staff = None
     shelter = models.ForeignKey(
         'Shelter', related_name='animals', on_delete=models.PROTECT, null=True)
-    staff = models.ForeignKey(
-        'Staff', related_name='animals', on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.name
-
-# При сохранении модели, проставляю дату смены staff'а
-    def save(self, *args, **kwargs):
-        if self.staff != self.__original_staff:
-            self.linked_staff_date = timezone.now()
-
-        super(Animal, self).save(*args, **kwargs)
-        self.__original_staff = self.staff
 
 
 # считаю кол-во животных текущего типа
@@ -69,6 +57,15 @@ class Staff(models.Model):
         "Shelter", on_delete=models.PROTECT, related_name='staff', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
+    animals = models.ManyToManyField('Animal', through='AnimalConnection')
 
     def __str__(self):
         return self.name
+
+
+class AnimalConnection(models.Model):
+    animal = models.ForeignKey('Animal', on_delete=models.CASCADE)
+    staff = models.ForeignKey('Staff', on_delete=models.CASCADE)
+
+    # timezone для возможности потестировать
+    connection_date = models.DateTimeField(default=timezone.now)
