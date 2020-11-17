@@ -1,42 +1,44 @@
 ### Мой первый опыт с DRF и django-filters
 
 ## Requirements.txt
-asgiref==3.3.1
-Django==3.1.3
-django-filter==2.4.0
-djangorestframework==3.12.2
-pytz==2020.4
-sqlparse==0.4.1
+asgiref==3.3.1   
+Django==3.1.3   
+django-filter==2.4.0   
+djangorestframework==3.12.2   
+pytz==2020.4   
+sqlparse==0.4.1   
 
 ## Установка из терминала
-`pip install requirements.txt`
+`pip install requirements.txt`   
 
 ## Запуск сервера
-`cd zoo/`
-`./manage.py runserver`
+`cd zoo/`   
+`./manage.py runserver`   
 
 ## Использование
-Так как проверял я только в http представлении в браузере, то и пишу согласно тому, что успел потыкать.
-Параметры CRUD полностью взяты из возможностей DefaultRouter, потому их описание укажу [тут](https://www.django-rest-framework.org/api-guide/routers/#defaultrouter).
+Так как проверял я только в http представлении в браузере, то и пишу согласно тому, что успел потыкать.   
+Параметры CRUD полностью взяты из возможностей DefaultRouter, потому их описание укажу [тут](https://www.django-rest-framework.org/api-guide/routers/#defaultrouter).   
 
 Сортировка работает с помощью параметра **ordering** и поддерживает все поля моделей, обратная сортировка с помощью символа **-**.
 
-Сортировка:
-`http://127.0.0.1:8000/animal_types/?ordering=name`
-`http://127.0.0.1:8000/shelters/?ordering=-created_at`
+Сортировка:   
+`http://127.0.0.1:8000/animal_types/?ordering=name`   
+`http://127.0.0.1:8000/shelters/?ordering=-created_at`   
 
-Стандартные фильтры:
-`http://127.0.0.1:8000/animals/?created_at=2020-11-15`
-`http://127.0.0.1:8000/animals/?animal_type=Млекопитающие`
-`http://127.0.0.1:8000/animals/?staff=Дима`
-`http://127.0.0.1:8000/animals/?shelter=Вольер`
+Стандартные фильтры:   
+`http://127.0.0.1:8000/animals/?created_at=2020-11-15`   
+`http://127.0.0.1:8000/animals/?animal_type=Млекопитающие`   
+`http://127.0.0.1:8000/animals/?staff=Дима`   
+`http://127.0.0.1:8000/animals/?shelter=Вольер`   
 
 
-Сложные фильтры:
-`http://127.0.0.1:8000/animals/?staff=Дима&linked_duration=2019-11-14`
-`http://127.0.0.1:8000/animals/?shelter_created=2020-11-10&shelter_updated=2020-11-16`
+Сложные фильтры:   
+>Например, найти сотрудников, за кем есть животные больше года и кто зарегистрирован в такую-то дату.
+`http://127.0.0.1:8000/staff/?duration=365&created_at__date=2020-11-17`   
+<!-- `http://127.0.0.1:8000/animals/?staff=Дима&linked_duration=2019-11-14` -->   
+`http://127.0.0.1:8000/animals/?shelter_created=2020-11-10&shelter_updated=2020-11-16`   
 
->Условие продолжительности я не очень понял. Сравнивать дату привязки животного и сотрудника можно только зная дату, с которой мы сравниваем, а не саму продолжительность. Иначе придется вносить значение продолжительности в сам экземпляр модели животного, а это как-то не то. Поэтому я просто сравниваю с переданной датой linked_duration и возвращаю животных, у кого дата изменения стафа ДО переданной.
+>Нашел как хранить связь между моделями в models.ManyToManyField через создание явно третьей модели отношений (**through**), где можно фиксировать дату присвоения любой связи.
 
 ## Чего точно не хватает этому коду или мне O.o
 * Тестов

@@ -15,14 +15,14 @@ from .serializers import *
 
 
 class AnimalsFilter(filters.FilterSet):
-    staff = filters.CharFilter(field_name='staff__name')
+    # staff = filters.CharFilter(field_name='staff__name')
     shelter = filters.CharFilter(field_name='shelter__name')
     animal_type = filters.CharFilter(field_name='animal_type__name')
     created_at = filters.DateTimeFilter(
         field_name='created_at', lookup_expr='date')
     updated_at = filters.DateTimeFilter(
         field_name='updated_at', lookup_expr='date')
-    linked_duration = filters.DateTimeFilter(
+    linked_duration = filters.DateFilter(
         field_name='linked_staff_date', lookup_expr='lte')
     shelter_created = filters.DateTimeFilter(
         field_name='shelter__created_at', lookup_expr='date')
@@ -47,16 +47,12 @@ class AnimalViewSet(viewsets.ModelViewSet):
 class AnimalTypeViewSet(viewsets.ModelViewSet):
     queryset = AnimalType.objects.all()
     serializer_class = AnimalTypeSerializer
-    # filterset_fields = ['name', 'created_at', 'updated_at']
     filterset_fields = '__all__'
-    # ordering_fields = ['created_at', 'updated_at', 'name']
 
 
 class ShelterViewSet(viewsets.ModelViewSet):
     queryset = Shelter.objects.all().order_by('created_at')
     serializer_class = ShelterSerializer
-    # filterset_fields = ['name', 'created_at__date',
-    #                     'updated_at__date', 'staff__name']
     filterset_fields = '__all__'
     ordering_fields = ['created_at', 'updated_at', 'name']
 
@@ -64,6 +60,16 @@ class ShelterViewSet(viewsets.ModelViewSet):
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all().order_by('created_at')
     serializer_class = StaffSerializer
-    # filterset_fields = ['name', 'created_at', 'updated_at', 'shelter__name']
     filterset_fields = '__all__'
     ordering_fields = ['created_at', 'updated_at', 'name']
+
+    # Согласно обратной связи можно залезть в значения связанной модели,
+    # и так получить желаемый фильтр! Ура!
+    def get_queryset(self):
+        queryset = Staff.objects.all()
+        duration = self.request.query_params.get('duration', None)
+        if duration is not None:
+            result_queryset = []
+            queryset = Staff.objects.filter(
+                animalconnection__connection_date__lte=timezone.now() - timezone.timedelta(int(duration)))
+        return queryset

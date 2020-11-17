@@ -6,6 +6,8 @@ from .models import *
 
 
 class AnimalSerializer(serializers.ModelSerializer):
+    staff = serializers.PrimaryKeyRelatedField(
+        many=True, allow_empty=False, queryset=Staff.objects.all())
 
     class Meta:
         model = Animal
@@ -30,8 +32,8 @@ class ShelterSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
-    animals = serializers.StringRelatedField(many=True)
-    shelters = serializers.StringRelatedField(many=True)
+    animals = serializers.PrimaryKeyRelatedField(
+        many=True, allow_empty=False, queryset=Animal.objects.all())
 
     class Meta:
         model = Staff
