@@ -57,7 +57,8 @@ class Staff(models.Model):
         "Shelter", on_delete=models.PROTECT, related_name='staff', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
-    animals = models.ManyToManyField('Animal', through='AnimalConnection')
+    animals = models.ManyToManyField(
+        'Animal', through='AnimalConnection', related_name='staff')
 
     def __str__(self):
         return self.name
